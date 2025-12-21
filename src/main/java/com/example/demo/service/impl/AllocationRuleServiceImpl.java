@@ -1,4 +1,4 @@
-package com.example.demo.service.implementation;
+package com.example.demo.service.impl;
 
 import com.example.demo.entity.AllocationRule;
 import com.example.demo.exception.ResourceNotFoundException;
