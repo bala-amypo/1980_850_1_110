@@ -40,16 +40,18 @@ public class ResourceRequestServiceImpl implements ResourceRequestService {
     }
 
     @Override
-    public ResourceRequest createRequest(Long userId, Long resourceId) {
+    public ResourceRequest createRequest(Long userId) {
+		ResourceRequest request = new ResourceRequest();
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        Resource resource = resourceRepository.findById(resourceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + resourceId));
+        Resource resource = resourceRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + userId));
 
-        ResourceRequest request = new ResourceRequest(user, resource, "PENDING");
+        ResourceRequest resourceRequest = new ResourceRequest(user, resource, "PENDING");
         request.setRequestedAt(LocalDateTime.now());
-        return requestRepository.save(request);
+        return requestRepository.save(resourceRequest);
     }
 
     @Override

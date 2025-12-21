@@ -19,8 +19,7 @@ public class ResourceRequestController {
 
 	@PostMapping
 	public ResponseEntity<ResourceRequest> createRequest(@RequestParam Long userId) {
-		ResourceRequest request = new ResourceRequest();
-		ResourceRequest created = requestService.createRequest(userId, request);
+		ResourceRequest created = requestService.createRequest(userId);
 		return ResponseEntity.ok(created);
 	}
 

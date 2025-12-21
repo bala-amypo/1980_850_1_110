@@ -10,7 +10,7 @@ public interface ResourceRequestService {
 
 	public ResourceRequest getRequestById(Long id);
 
-	public ResourceRequest createRequest(Long userId, Long resourceId);
+	public ResourceRequest createRequest(Long userId);
 
 	public ResourceRequest updateRequestStatus(Long id, String status);
 
