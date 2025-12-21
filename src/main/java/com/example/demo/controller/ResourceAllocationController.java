@@ -1,41 +1,44 @@
-package com.example.demo.controller;
-
-import com.example.demo.entity.ResourceAllocation;
-import com.example.demo.service.ResourceAllocationService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+package com.example.demo.service.impl;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/allocations")
-public class ResourceAllocationController {
+import org.springframework.stereotype.Service;
 
-    private final ResourceAllocationService allocationService;
+import com.example.demo.entity.ResourceAllocation;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.ResourceAllocationRepository;
+import com.example.demo.repository.ResourceRepository;
+import com.example.demo.repository.ResourceRequestRepository;
+import com.example.demo.service.ResourceAllocationService;
 
-    public ResourceAllocationController(ResourceAllocationService allocationService) {
-        this.allocationService = allocationService;
-    }
+@Service
+public class ResourceAllocationServiceImpl implements ResourceAllocationService {
 
-    @PostMapping
-    public ResponseEntity<ResourceAllocation> createAllocation(@RequestBody ResourceAllocation allocation) {
-        ResourceAllocation created = allocationService.createAllocation(allocation);
-        return ResponseEntity.ok(created);
-    }
+	private final ResourceAllocationRepository allocationRepository;
 
-    @GetMapping
-    public ResponseEntity<List<ResourceAllocation>> getAllAllocations() {
-        return ResponseEntity.ok(allocationService.getAllAllocations());
-    }
+	public ResourceAllocationServiceImpl(ResourceAllocationRepository allocationRepository,
+			ResourceRepository resourceRepository, ResourceRequestRepository requestRepository) {
+		this.allocationRepository = allocationRepository;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ResourceAllocation> getAllocationById(@PathVariable Long id) {
-        return ResponseEntity.ok(allocationService.getAllocationById(id));
-    }
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteAllocation(@PathVariable Long id) {
-        allocationService.deleteAllocation(id);
-        return ResponseEntity.ok("Allocation deleted successfully");
-    }
+	@Override
+	public List<ResourceAllocation> getAllAllocations() {
+		return allocationRepository.findAll();
+	}
+
+	@Override
+	public ResourceAllocation getAllocationById(Long id) {
+		return allocationRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Resource Allocation not found with id: " + id));
+	}
+
+	@Override
+	public ResourceAllocation autoAllocate(Long requestId) {
+		ResourceAllocation resource = allocationRepository.findById(requestId)
+				.orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + requestId));
+
+		return allocationRepository.save(resource);
+	}
+
 }
