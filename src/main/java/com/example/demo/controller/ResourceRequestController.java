@@ -11,31 +11,32 @@ import java.util.List;
 @RequestMapping("/api/requests")
 public class ResourceRequestController {
 
-    private final ResourceRequestService requestService;
+	private final ResourceRequestService requestService;
 
-    public ResourceRequestController(ResourceRequestService requestService) {
-        this.requestService = requestService;
-    }
+	public ResourceRequestController(ResourceRequestService requestService) {
+		this.requestService = requestService;
+	}
 
-    @PostMapping
-    public ResponseEntity<ResourceRequest> createRequest(@RequestBody ResourceRequest request) {
-        ResourceRequest created = requestService.createRequest(request);
-        return ResponseEntity.ok(created);
-    }
+	@PostMapping
+	public ResponseEntity<ResourceRequest> createRequest(@RequestParam Long userId) {
+		ResourceRequest request = new ResourceRequest();
+		ResourceRequest created = requestService.createRequest(userId, request);
+		return ResponseEntity.ok(created);
+	}
 
-    @GetMapping
-    public ResponseEntity<List<ResourceRequest>> getAllRequests() {
-        return ResponseEntity.ok(requestService.getAllRequests());
-    }
+	@GetMapping
+	public ResponseEntity<List<ResourceRequest>> getAllRequests() {
+		return ResponseEntity.ok(requestService.getAllRequests());
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ResourceRequest> getRequestById(@PathVariable Long id) {
-        return ResponseEntity.ok(requestService.getRequestById(id));
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<ResourceRequest> getRequestById(@PathVariable Long id) {
+		return ResponseEntity.ok(requestService.getRequestById(id));
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRequest(@PathVariable Long id) {
-        requestService.deleteRequest(id);
-        return ResponseEntity.ok("Request deleted successfully");
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> deleteRequest(@PathVariable Long id) {
+		requestService.deleteRequest(id);
+		return ResponseEntity.ok("Request deleted successfully");
+	}
 }
