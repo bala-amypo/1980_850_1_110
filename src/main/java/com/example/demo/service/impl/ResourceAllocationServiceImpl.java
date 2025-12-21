@@ -1,4 +1,4 @@
-package com.example.demo.service.implementation;
+package com.example.demo.service.impl;
 
 import com.example.demo.entity.ResourceAllocation;
 import com.example.demo.entity.Resource;
