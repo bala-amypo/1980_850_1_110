@@ -1,44 +1,36 @@
-package com.example.demo.service.impl;
+package com.example.demo.controller;
+
+import com.example.demo.entity.ResourceAllocation;
+import com.example.demo.service.ResourceAllocationService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+@RestController
+@RequestMapping("/api/allocations")
+public class ResourceAllocationController {
 
-import com.example.demo.entity.ResourceAllocation;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.ResourceAllocationRepository;
-import com.example.demo.repository.ResourceRepository;
-import com.example.demo.repository.ResourceRequestRepository;
-import com.example.demo.service.ResourceAllocationService;
+    private final ResourceAllocationService allocationService;
 
-@Service
-public class ResourceAllocationServiceImpl implements ResourceAllocationService {
+    public ResourceAllocationController(ResourceAllocationService allocationService) {
+        this.allocationService = allocationService;
+    }
 
-	private final ResourceAllocationRepository allocationRepository;
+    @PostMapping(path = "/auto/")
+    public ResponseEntity<ResourceAllocation> autoAllocate(@RequestParam Long requestId) {
+        ResourceAllocation created = allocationService.autoAllocate(requestId);
+        return ResponseEntity.ok(created);
+    }
 
-	public ResourceAllocationServiceImpl(ResourceAllocationRepository allocationRepository,
-			ResourceRepository resourceRepository, ResourceRequestRepository requestRepository) {
-		this.allocationRepository = allocationRepository;
+    @GetMapping
+    public ResponseEntity<List<ResourceAllocation>> getAllAllocations() {
+        return ResponseEntity.ok(allocationService.getAllAllocations());
+    }
 
-	}
-
-	@Override
-	public List<ResourceAllocation> getAllAllocations() {
-		return allocationRepository.findAll();
-	}
-
-	@Override
-	public ResourceAllocation getAllocationById(Long id) {
-		return allocationRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Resource Allocation not found with id: " + id));
-	}
-
-	@Override
-	public ResourceAllocation autoAllocate(Long requestId) {
-		ResourceAllocation resource = allocationRepository.findById(requestId)
-				.orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + requestId));
-
-		return allocationRepository.save(resource);
-	}
+    @GetMapping("/{id}")
+    public ResponseEntity<ResourceAllocation> getAllocationById(@PathVariable Long id) {
+        return ResponseEntity.ok(allocationService.getAllocationById(id));
+    }
 
 }
