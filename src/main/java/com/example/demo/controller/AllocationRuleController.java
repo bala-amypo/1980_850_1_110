@@ -17,26 +17,22 @@ public class AllocationRuleController {
         this.allocationRuleService = allocationRuleService;
     }
 
-    // ✅ Create a new rule
     @PostMapping
     public ResponseEntity<AllocationRule> createRule(@RequestBody AllocationRule rule) {
         AllocationRule created = allocationRuleService.createRule(rule);
         return ResponseEntity.ok(created);
     }
 
-    // ✅ Get all rules
     @GetMapping
     public ResponseEntity<List<AllocationRule>> getAllRules() {
         return ResponseEntity.ok(allocationRuleService.getAllRules());
     }
 
-    // ✅ Get rule by ID
     @GetMapping("/{id}")
     public ResponseEntity<AllocationRule> getRuleById(@PathVariable Long id) {
         return ResponseEntity.ok(allocationRuleService.getRuleById(id));
     }
 
-    // ✅ Delete rule by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRule(@PathVariable Long id) {
         allocationRuleService.deleteRule(id);
