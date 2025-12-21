@@ -1,0 +1,50 @@
+package com.example.demo.service.implementation;
+
+import com.example.demo.entity.AllocationRule;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.AllocationRuleRepository;
+import com.example.demo.service.AllocationRuleService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class AllocationRuleServiceImpl implements AllocationRuleService {
+
+    private final AllocationRuleRepository allocationRuleRepository;
+
+    public AllocationRuleServiceImpl(AllocationRuleRepository allocationRuleRepository) {
+        this.allocationRuleRepository = allocationRuleRepository;
+    }
+
+    @Override
+    public List<AllocationRule> getAllRules() {
+        return allocationRuleRepository.findAll();
+    }
+
+    @Override
+    public AllocationRule getRuleById(Long id) {
+        return allocationRuleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Allocation Rule not found with id: " + id));
+    }
+
+    @Override
+    public AllocationRule createRule(AllocationRule rule) {
+        return allocationRuleRepository.save(rule);
+    }
+
+    @Override
+    public AllocationRule updateRule(Long id, AllocationRule updatedRule) {
+        AllocationRule existingRule = getRuleById(id);
+        existingRule.setRuleName(updatedRule.getRuleName());
+        existingRule.setRuleType(updatedRule.getRuleType());
+        existingRule.setPriorityWeight(updatedRule.getPriorityWeight());
+        return allocationRuleRepository.save(existingRule);
+    }
+
+    @Override
+    public void deleteRule(Long id) {
+        AllocationRule existingRule = getRuleById(id);
+        allocationRuleRepository.delete(existingRule);
+    }
+}
