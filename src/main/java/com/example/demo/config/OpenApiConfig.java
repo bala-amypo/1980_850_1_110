@@ -16,6 +16,6 @@ public class OpenApiConfig {
                         .title("Resource Allocation Optimizer API")
                         .description("API for managing shared resources, requests, and allocations")
                         .version("1.0.0"))
-                .servers(List.of(new Server().url("http://localhost:9005")));
+                .servers(List.of(new Server().url("https://9270.pro604cr.amypo.ai/")));
     }
 }
