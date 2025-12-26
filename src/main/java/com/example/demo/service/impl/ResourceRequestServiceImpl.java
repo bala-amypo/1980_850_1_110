@@ -1,70 +1,58 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.ResourceRequest;
-import com.example.demo.entity.Resource;
 import com.example.demo.entity.User;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.ResourceRequestRepository;
-import com.example.demo.repository.ResourceRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.ResourceRequestService;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class ResourceRequestServiceImpl implements ResourceRequestService {
-
-    private final ResourceRequestRepository requestRepository;
-    private final UserRepository userRepository;
-    private final ResourceRepository resourceRepository;
-
-    public ResourceRequestServiceImpl(ResourceRequestRepository requestRepository,
-                                      UserRepository userRepository,
-                                      ResourceRepository resourceRepository) {
-        this.requestRepository = requestRepository;
-        this.userRepository = userRepository;
-        this.resourceRepository = resourceRepository;
+    
+    private final ResourceRequestRepository reqRepo;
+    private final UserRepository userRepo;
+    
+    public ResourceRequestServiceImpl(ResourceRequestRepository reqRepo, UserRepository userRepo) {
+        this.reqRepo = reqRepo;
+        this.userRepo = userRepo;
     }
-
+    
     @Override
-    public List<ResourceRequest> getAllRequests() {
-        return requestRepository.findAll();
+    public ResourceRequest createRequest(Long userId, ResourceRequest request) {
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        if (request.getStartTime() != null && request.getEndTime() != null && 
+            !request.getStartTime().isBefore(request.getEndTime())) {
+            throw new IllegalArgumentException("Start time must be before end time");
+        }
+        
+        request.setRequestedBy(user);
+        if (request.getStatus() == null) {
+            request.setStatus("PENDING");
+        }
+        
+        return reqRepo.save(request);
     }
-
+    
     @Override
-    public ResourceRequest getRequestById(Long id) {
-        return requestRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Resource Request not found with id: " + id));
+    public List<ResourceRequest> getRequestsByUser(Long userId) {
+        return reqRepo.findByRequestedBy_Id(userId);
     }
-
+    
     @Override
-    public ResourceRequest createRequest(Long userId) {
-		ResourceRequest request = new ResourceRequest();
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-
-        Resource resource = resourceRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + userId));
-
-        ResourceRequest resourceRequest = new ResourceRequest(user, resource, "PENDING");
-        request.setRequestedAt(LocalDateTime.now());
-        return requestRepository.save(resourceRequest);
+    public ResourceRequest getRequest(Long id) {
+        return reqRepo.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Request not found"));
     }
-
+    
     @Override
-    public ResourceRequest updateRequestStatus(Long id, String status) {
-        ResourceRequest request = getRequestById(id);
+    public ResourceRequest updateRequestStatus(Long requestId, String status) {
+        ResourceRequest request = getRequest(requestId);
         request.setStatus(status);
-        request.setProcessedAt(LocalDateTime.now());
-        return requestRepository.save(request);
-    }
-
-    @Override
-    public void deleteRequest(Long id) {
-        ResourceRequest request = getRequestById(id);
-        requestRepository.delete(request);
+        return reqRepo.save(request);
     }
 }
