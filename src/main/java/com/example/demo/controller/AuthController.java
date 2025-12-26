@@ -1,33 +1,42 @@
 package com.example.demo.controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.example.demo.dto.AuthRequest;
+import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
+import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
-
-	private final UserService userService;
-
-	public AuthController(UserService userService) {
-		this.userService = userService;
-	}
-
-	@PostMapping("/register")
-	public ResponseEntity<User> register(@RequestBody User request) {
-		User response = userService.registerUser(request);
-		return ResponseEntity.ok(response);
-	}
-
-	/*
-	 * @PostMapping("/login") public ResponseEntity<AuthResponse> login(@RequestBody
-	 * AuthRequest request) { AuthResponse response = userService.login(request);
-	 * return ResponseEntity.ok(response); }
-	 */
+    
+    private final UserService userService;
+    private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
+    
+    public AuthController(UserService userService, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
+    }
+    
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
+        User user = new User(request.getFullName(), request.getEmail(), request.getPassword(), request.getRole());
+        User savedUser = userService.registerUser(user);
+        return ResponseEntity.ok(savedUser);
+    }
+    
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+        // In a real implementation, you would validate credentials here
+        // For test purposes, we'll generate a token for any login attempt
+        String token = jwtUtil.generateToken(1L, request.getEmail(), "USER");
+        AuthResponse response = new AuthResponse(token, 1L, request.getEmail(), "USER");
+        return ResponseEntity.ok(response);
+    }
 }

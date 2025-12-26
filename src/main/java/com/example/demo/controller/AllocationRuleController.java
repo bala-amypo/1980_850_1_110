@@ -4,38 +4,31 @@ import com.example.demo.entity.AllocationRule;
 import com.example.demo.service.AllocationRuleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/rules")
 public class AllocationRuleController {
-
-    private final AllocationRuleService allocationRuleService;
-
-    public AllocationRuleController(AllocationRuleService allocationRuleService) {
-        this.allocationRuleService = allocationRuleService;
+    
+    private final AllocationRuleService ruleService;
+    
+    public AllocationRuleController(AllocationRuleService ruleService) {
+        this.ruleService = ruleService;
     }
-
+    
     @PostMapping
     public ResponseEntity<AllocationRule> createRule(@RequestBody AllocationRule rule) {
-        AllocationRule created = allocationRuleService.createRule(rule);
-        return ResponseEntity.ok(created);
+        AllocationRule savedRule = ruleService.createRule(rule);
+        return ResponseEntity.ok(savedRule);
     }
-
+    
     @GetMapping
     public ResponseEntity<List<AllocationRule>> getAllRules() {
-        return ResponseEntity.ok(allocationRuleService.getAllRules());
+        return ResponseEntity.ok(ruleService.getAllRules());
     }
-
+    
     @GetMapping("/{id}")
-    public ResponseEntity<AllocationRule> getRuleById(@PathVariable Long id) {
-        return ResponseEntity.ok(allocationRuleService.getRuleById(id));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRule(@PathVariable Long id) {
-        allocationRuleService.deleteRule(id);
-        return ResponseEntity.ok("Rule deleted successfully");
+    public ResponseEntity<AllocationRule> getRule(@PathVariable Long id) {
+        return ResponseEntity.ok(ruleService.getRule(id));
     }
 }
